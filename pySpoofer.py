@@ -45,8 +45,8 @@ def getArgs() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser()          # Creating the parser object
     # Adding the arguments
-    parser.add_argument("-t", "--target", dest="target", help="Target IP / IP Range.")
-    parser.add_argument("-g", "--gateway", dest="gateway", help="Gateway IP.")
+    parser.add_argument("-t", "--target", dest="target", help="Target IP / IP Range.", required=True)
+    parser.add_argument("-g", "--gateway", dest="gateway", help="Gateway IP.", required=True)
     options = parser.parse_args()               # Parsing the arguments
     # Checking if the arguments are valid
     if not options.target:
