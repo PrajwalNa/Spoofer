@@ -91,6 +91,7 @@ def spoof(targetIP, spoofIP, targetMAC):
     Args:
         targetIP (str): The IP address of the target device
         spoofIP (str): The IP address of the device whose MAC address we want to spoof (usually the gateway's IP address)
+        targetMAC (str): The MAC address of the target device
 
     Returns:
         None
