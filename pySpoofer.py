@@ -1,6 +1,6 @@
 """
 Dev: Prajwal Nautiyal
-Date: 08 September 2023
+Date: 09 September 2023
 ---------------------------------
 This is a simple ARP spoofing script.
 It uses the scapy library to send and receive packets.
