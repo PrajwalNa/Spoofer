@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Dev: Prajwal Nautiyal
 Date: 09 September 2023
@@ -13,11 +14,6 @@ ANSI escape codes:
     Cyan Background: \033[48;5;51m
     Black Foreground: \033[38;5;0m
 ---------------------------------
-Error Codes:
-    0: No error
-    1: No target IP
-    2: No gateway IP
-    3: Both target and gateway IP are the same
 """
 
 # Importing libraries
@@ -39,11 +35,6 @@ def getArgs() -> argparse.Namespace:
 
     Returns:
         options: The arguments
-
-    Raises:
-        error code 1: If no target IP is specified
-        error code 2: If no gateway IP is specified
-        error code 3: If the target IP and the gateway IP are the same
     """
     parser = argparse.ArgumentParser()          # Creating the parser object
     # Adding the arguments
@@ -53,13 +44,10 @@ def getArgs() -> argparse.Namespace:
     # Checking if the arguments are valid
     if not options.target:
         parser.error("\033[91m[-] Please specify a target IP\n\033[93mUse --help for more info.\033[0m")
-        sys.exit(1)
     elif not options.gateway:
         parser.error("\033[91m[-] Please specify a gateway IP\n\033[93mUse --help for more info.\033[0m")
-        sys.exit(2)
     if options.target == options.gateway:
         parser.error("\033[91m[-] The target IP and the gateway IP cannot be the same.\033[0m")
-        sys.exit(3)
     # Returning the arguments if they are valid
     return options
 
