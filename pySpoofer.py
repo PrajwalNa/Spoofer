@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """
 Dev: Prajwal Nautiyal
-Date: 09 September 2023
+Date: 05 May 2024
 ---------------------------------
 This is a simple ARP spoofing script.
 It uses the scapy library to send and receive packets.
